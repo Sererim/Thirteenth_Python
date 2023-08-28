@@ -1,5 +1,8 @@
 from exceptions import NegativeLenghtError, NotAllowedNumberError, TriangleDoesnotExistError, WrongInput
 
+from random import randint as rand
+from exceptions import IncorrectNumberType, NumberIsTooLargeError
+
 class Triangle:
     """
     Simple class for triangle types.
@@ -50,7 +53,104 @@ class Triangle:
         return s
 
 
+class PrimeTest:
+    """
+    Class that checks if a number is a prime or not.
+    """
+    _MAX_NUMBER = 100_000_000
+    _MIN_NUMBER = -100_000_000
+    
+    def __init__(self, num: int) -> None:
+        if not isinstance(num, int):
+            raise IncorrectNumberType("Integer", num)
+        self.num = num
+        if not self.allowed_number():
+            raise NumberIsTooLargeError(self.num, self._MIN_NUMBER, self._MAX_NUMBER)
+        
+    def even_or_odd(self) -> bool:
+        return True if int(self.d) % 2 == 0 else False
+    
+    def allowed_number(self) -> bool:
+        return True if self.num < self._MAX_NUMBER and self.num > self._MIN_NUMBER else False
+    
+    # We will use Miller–Rabin test. Assume that zero is a prime.    
+    def test(self) -> bool:
+        """Using Miller-Rabin test we will find out if num is a prime.
+        Returns:
+            True if entered number is a prime.
+            False if not a prime.
+        """
+        self.d: float = self.num - 1
+        s, a = 0, 0
+        x, y = 0.0, 0.0
+        
+        while self.even_or_odd():
+            s += 1
+            self.d /= 2
+            
+        for i in range(0, 25):
+            a = rand(2, self.num - 2)
+            x = (a ** self.d) % self.num
+            for j in range(s + 2):
+                y = (x ** 2) % self.num
+                if y == 1 and x != 1 and x != self.num - 1:
+                    return False
+                x = y
+        return True
+    
+    def __str__(self) -> str:
+        return f"Entered number {self.num} is a prime." if self.test() else f"Entered number {self.num} is not a prime."
+
+
+class Game:
+    def __init__(self, guees_amount: int = None, range: list[int] = None) -> None:
+        self.num: int = 0
+        
+        if range is None:
+            range = [0, 1000 + 1]        
+                
+        self.secret_number = rand(*range)
+        
+        if guees_amount is None:
+            guees_amount = 10
+
+        self.guees_amount = guees_amount
+        
+    def clues(self) -> bool:
+        if self.num == self.secret_number:
+            return True
+        elif self.num > self.secret_number:
+            print(f"The number is smaller than:\n{self.num}")
+        else:
+            print(f"The number is bigger than:\n{self.num}")
+        return False
+    
+    def mainloop(self):
+        print("Program is working.\n"
+            "I came up with a number try to guess it.\n"
+          f"You have {self.guees_amount} tries to do it.")
+        for i in range(self.guees_amount, 0, -1):
+            try:
+                self.num = int(input())
+            except Exception as e:
+                raise IncorrectNumberType("Integer", self.num)
+            if self.num not in range(0, 1000 + 1):
+                raise NumberIsTooLargeError(self.num, 0, 1000)
+            
+            if self.clues():
+                print("Correct")
+                break
+            else:
+                print(f"Wrong.\nTry again you have {i} tries left")
+        else:
+            print(f"The number was {self.secret_number}")
+
+
 if __name__ == "__main__":
     triangle = Triangle([3, 4, 5])
     print(triangle)
+    num = PrimeTest(251)
+    print(num)
+    game = Game(10)
+    game.mainloop()
     

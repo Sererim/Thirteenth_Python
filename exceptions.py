@@ -38,3 +38,21 @@ class WrongInput(UserException):
         return f"Wrong input. Such {self.error} is not allowed."
 
 
+class IncorrectNumberType(UserException):
+    def __init__(self, name, num) -> None:
+        self.num = num
+        self.type = name
+        
+    def __str__(self) -> str:
+        return f"{self.num} of type {type(self.num)}\nIs not allowed. Only {self.type} is allowed."
+
+
+class NumberIsTooLargeError(UserException):
+    def __init__(self, value: int, MIN: int, MAX: int) -> None:
+        self.value = value
+        self.MIN = MIN
+        self.MAX = MAX
+        
+    def __str__(self) -> str:
+        return f"Entered number {self.value} is not within the range of [{self.MIN}, {self.MAX}]"
+
